@@ -1,0 +1,63 @@
+.led-number-container {
+  display: flex;
+  height: 100px;
+  justify-content: center;
+}
+
+.algorism-container {
+  height: 100px;
+  position: relative;
+  width: 55.16px;
+}
+
+.middle-segment {
+  left: 2px;
+  position: absolute;
+  top: 43px;
+}
+
+.top-left-segment {
+  left: -2px;
+  position: absolute;
+  top: 2px;
+}
+
+.top-segment {
+  position: absolute;
+  top: 0;
+}
+
+.top-right-segment {
+  position: absolute;
+  top: 2px;
+  right: 1px;
+}
+
+.bottom-right-segment {
+  bottom: 2px;
+  position: absolute;
+  right: 1px;
+}
+
+.bottom-segment {
+  position: absolute;
+  bottom: 0;
+}
+
+.bottom-left-segment {
+  position: absolute;
+  bottom: 2px;
+  left: -2px;
+}
+
+.unselected-segment {
+  filter: invert(84%) sepia(0%) saturate(48%) hue-rotate(137deg) brightness(102%) contrast(103%);
+}
+
+.selected-green-segment {
+  filter: invert(44%) sepia(79%) saturate(1153%) hue-rotate(70deg) brightness(105%) contrast(101%);
+}
+
+.selected-red-segment {
+  filter: invert(18%) sepia(66%) saturate(6728%) hue-rotate(27deg) brightness(101%) contrast(101%);
+}
