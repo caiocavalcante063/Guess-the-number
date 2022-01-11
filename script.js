@@ -1,6 +1,9 @@
+const ledContainer = document.querySelector(".led-number-container");
+
 const createLedSegment = (segment, number) => {
   const ledSegment = document.createElement("img");
   ledSegment.src = `./images/${segment}.svg`;
+  ledSegment.alt = segment;
   const isSelected = ledScreenSegmentSwitcher(segment, number);
   ledSegment.classList.add(
     segment,
@@ -95,7 +98,8 @@ const ledScreenSegmentSwitcher = (ledSegment, number) => {
 };
 
 const setLedDisplay = (number) => {
-  const ledContainer = document.querySelector(".led-number-container");
+  const ledInnerContainer = document.createElement("div");
+  ledInnerContainer.className = "led-number-inner-container";
   const algorismContainer = document.createElement("div");
   algorismContainer.className = "algorism-container";
 
@@ -115,9 +119,35 @@ const setLedDisplay = (number) => {
     );
   }
 
-  ledContainer.appendChild(algorismContainer);
+  ledInnerContainer.appendChild(algorismContainer);
+  ledContainer.appendChild(ledInnerContainer);
+};
+
+const sendNumber = () => {
+  const sendButton = document.querySelector("#submit-data-btn");
+
+  sendButton.addEventListener("click", () => {
+    const { value } = document.querySelector("#user-input");
+
+    if (
+      isNaN(value) ||
+      value.length == 0 ||
+      Number(value) < 0 ||
+      Number(value) > 999
+    )
+      return alert("Insira um número não-negativo de 1 a 3 algarismos");
+
+    // limpando o display antes de exibir um novo valor
+    while (ledContainer.firstChild) {
+      ledContainer.removeChild(ledContainer.lastChild);
+    }
+
+    // exibindo o novo valor no display
+    [...value].forEach((val) => setLedDisplay(Number(val)));
+  });
 };
 
 window.onload = () => {
-  setLedDisplay(4);
+  setLedDisplay(0);
+  sendNumber();
 };

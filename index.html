@@ -11,11 +11,14 @@
 
 <body>
   <main>
-    <h1>Qual é o número?</h1>
+    <h1 class="title">QUAL É O NÚMERO?</h1>
+    <div class="title-bar-container">
+      <img src="./images/title-bar.svg" alt="title bar" class="title-bar">
+    </div>
     <div class="led-number-container"></div>
-    <div class="enter-container">
-      <input type="number" name="input-number" id="input-number">
-      <button type="button" id="enter-button">ENVIAR</button>
+    <div class="inputs-container">
+      <input type="text" name="user-input" id="user-input" placeholder="Digite o palpite">
+      <button type="button" id="submit-data-btn">ENVIAR</button>
     </div>
   </main>
   <script src="script.js"></script>
