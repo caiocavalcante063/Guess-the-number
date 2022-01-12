@@ -1,4 +1,46 @@
 const ledContainer = document.querySelector(".led-number-container");
+const submitButton = document.querySelector("#submit-data-btn");
+const userInput = document.querySelector("#user-input");
+
+const fetchNumber = () => {
+  fetch("https://us-central1-ss-devops.cloudfunctions.net/rand?min=1&max=300")
+    .then(async (response) => {
+      if (!response.ok) {
+        const res = await response.text();
+        throw new Error(res);
+      }
+      return response.json();
+    })
+    .then(({ value }) => localStorage.setItem("sortedNumber", value))
+    // em caso de erro na requisição, a função handleError é chamada com o status code do erro como parâmetro
+    .catch(({ message }) => handleError(JSON.parse(`${message}`).StatusCode));
+};
+
+const handleError = (errorCode) => {
+  // limpando o display antes de exibir um novo valor
+  while (ledContainer.firstChild) {
+    ledContainer.removeChild(ledContainer.lastChild);
+  }
+
+  // escrevendo o codigo do erro no display
+  [...String(errorCode)].forEach((val) => setLedDisplay(Number(val)));
+
+  // adicionando a classe selected-red-segment nos segmentos selecionados, para trocar as cores do display para vermelho
+  const statusMessage = document.querySelector(".status-message");
+  const selectedSegments = document.querySelectorAll(".selected-segment");
+
+  for (segment of selectedSegments) {
+    segment.classList.remove("selected-segment");
+    segment.classList.add("selected-red-segment");
+  }
+
+  // exibindo a mensagem de erro
+  statusMessage.innerHTML = "Erro";
+  statusMessage.classList.add("error-message");
+
+  // criando botao de jogar nova partida e implementando sua funcionalidade
+  newMatchHandler();
+};
 
 const createLedSegment = (segment, number) => {
   const ledSegment = document.createElement("img");
@@ -123,11 +165,61 @@ const setLedDisplay = (number) => {
   ledContainer.appendChild(ledInnerContainer);
 };
 
-const sendNumber = () => {
-  const sendButton = document.querySelector("#submit-data-btn");
+const disableUserInput = () => {
+  userInput.disabled = true;
+  submitButton.disabled = true;
+};
 
-  sendButton.addEventListener("click", () => {
-    const { value } = document.querySelector("#user-input");
+const newMatchHandler = () => {
+  // criando botão de "nova partida"
+  const newMatchBtnContainer = document.querySelector(
+    ".new-match-btn-container"
+  );
+  const newMatchBtn = document.createElement("button");
+  const refreshIcon = document.createElement("img");
+
+  refreshIcon.src = "./images/refresh.svg";
+  refreshIcon.alt = "refresh icon";
+  newMatchBtn.className = "new-match-btn";
+  newMatchBtn.innerText = "NOVA PARTIDA";
+
+  // implementando a funcionalidade de reiniciar o jogo
+  newMatchBtn.addEventListener("click", () => document.location.reload());
+
+  newMatchBtn.appendChild(refreshIcon);
+  newMatchBtnContainer.appendChild(newMatchBtn);
+
+  // desabilitando os inputs
+  disableUserInput();
+};
+
+const handleVictory = (statusMessage) => {
+  const selectedSegments = document.querySelectorAll(".selected-segment");
+
+  for (segment of selectedSegments) {
+    segment.classList.remove("selected-segment");
+    segment.classList.add("selected-green-segment");
+  }
+
+  statusMessage.innerHTML = "Você acertou!!!!";
+  statusMessage.classList.add("victory-message");
+
+  // criando botao de jogar nova partida e implementando sua funcionalidade
+  newMatchHandler();
+};
+
+const submittedNumberVerifier = (n) => {
+  const sortedNum = Number(localStorage.getItem("sortedNumber"));
+  const statusMessage = document.querySelector(".status-message");
+
+  if (n > sortedNum) statusMessage.innerHTML = "É menor";
+  if (n < sortedNum) statusMessage.innerHTML = "É maior";
+  if (n === sortedNum) handleVictory(statusMessage);
+};
+
+const submitBtnHandler = () => {
+  submitButton.addEventListener("click", () => {
+    const { value } = userInput;
 
     if (
       isNaN(value) ||
@@ -144,10 +236,17 @@ const sendNumber = () => {
 
     // exibindo o novo valor no display
     [...value].forEach((val) => setLedDisplay(Number(val)));
+
+    // checando se o usuario acertou o valor
+    submittedNumberVerifier(Number(value));
+
+    // limpando o input
+    userInput.value = "";
   });
 };
 
 window.onload = () => {
   setLedDisplay(0);
-  sendNumber();
+  submitBtnHandler();
+  fetchNumber();
 };
