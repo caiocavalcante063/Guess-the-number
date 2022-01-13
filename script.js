@@ -38,10 +38,10 @@ const handleError = (errorCode) => {
   }
 
   // Exibindo a mensagem de erro.
-  statusMessage.innerHTML = "Erro";
+  statusMessage.innerHTML = "ERRO";
   statusMessage.classList.add("error-message");
 
-  // Criando botao de jogar nova partida e desabilitando os inputs.
+  // Criando botao de jogar nova partida e desabilitando o botão de submit.
   newMatchHandler();
 };
 
@@ -195,12 +195,6 @@ const setLedDisplay = (number) => {
   ledContainer.appendChild(ledInnerContainer);
 };
 
-const disableUserInput = () => {
-  // Desabilitando o input do usuário e o botão de enviar resposta.
-  userInput.disabled = true;
-  submitButton.disabled = true;
-};
-
 const newMatchHandler = () => {
   // Criando botão de "nova partida".
   const newMatchBtnContainer = document.querySelector(
@@ -220,8 +214,8 @@ const newMatchHandler = () => {
   newMatchBtn.appendChild(refreshIcon);
   newMatchBtnContainer.appendChild(newMatchBtn);
 
-  // Desabilitando os inputs.
-  disableUserInput();
+  // Desabilitando o botão de submit.
+  submitButton.disabled = true;
 };
 
 const handleVictory = (statusMessage) => {
@@ -237,7 +231,7 @@ const handleVictory = (statusMessage) => {
   statusMessage.innerHTML = "Você acertou!!!!";
   statusMessage.classList.add("victory-message");
 
-  // Criando botao de jogar nova partida e desabilitando os inputs.
+  // Criando botao de jogar nova partida e desabilitando o botão de submit.
   newMatchHandler();
 };
 
