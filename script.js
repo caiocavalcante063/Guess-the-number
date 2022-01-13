@@ -5,27 +5,30 @@ const userInput = document.querySelector("#user-input");
 const fetchNumber = () => {
   fetch("https://us-central1-ss-devops.cloudfunctions.net/rand?min=1&max=300")
     .then(async (response) => {
+      // Se a requisição for bem sucedida, a função retorna o resultado convertido para Json,
+      // do contrário, um erro é retornado.
       if (!response.ok) {
         const res = await response.text();
         throw new Error(res);
       }
       return response.json();
     })
+    // Salvando o número retornado pela requisição no localStorage.
     .then(({ value }) => localStorage.setItem("sortedNumber", value))
-    // em caso de erro na requisição, a função handleError é chamada com o status code do erro como parâmetro
+    // Em caso de erro na requisição, a função handleError é chamada com o status code do erro como parâmetro.
     .catch(({ message }) => handleError(JSON.parse(`${message}`).StatusCode));
 };
 
 const handleError = (errorCode) => {
-  // limpando o display antes de exibir um novo valor
+  // Limpando o display antes de exibir um novo valor.
   while (ledContainer.firstChild) {
     ledContainer.removeChild(ledContainer.lastChild);
   }
 
-  // escrevendo o codigo do erro no display
+  // Escrevendo o codigo do erro no display.
   [...String(errorCode)].forEach((val) => setLedDisplay(Number(val)));
 
-  // adicionando a classe selected-red-segment nos segmentos selecionados, para trocar as cores do display para vermelho
+  // Alterando a classe dos segmentos selecionados para selected-red-segment, trocando as cores do display para vermelho.
   const statusMessage = document.querySelector(".status-message");
   const selectedSegments = document.querySelectorAll(".selected-segment");
 
@@ -34,21 +37,28 @@ const handleError = (errorCode) => {
     segment.classList.add("selected-red-segment");
   }
 
-  // exibindo a mensagem de erro
+  // Exibindo a mensagem de erro.
   statusMessage.innerHTML = "Erro";
   statusMessage.classList.add("error-message");
 
-  // criando botao de jogar nova partida e implementando sua funcionalidade
+  // Criando botao de jogar nova partida e desabilitando os inputs.
   newMatchHandler();
 };
 
 const createLedSegment = (segment, number) => {
+  // Criando uma imagem para cada segmento que forma um algarismo no display.
   const ledSegment = document.createElement("img");
   ledSegment.src = `./images/${segment}.svg`;
   ledSegment.alt = segment;
+
+  // Verificando qual classe o segmento de led deve receber, de acordo com
+  // o número e o segmento, para que a coloração seja exibida de forma correta.
   const isSelected = ledScreenSegmentSwitcher(segment, number);
   ledSegment.classList.add(
     segment,
+    // Como os segmentos são da cor preta por padrão, se o número escolhido
+    // for o "8", não é necessário verificar qual classe cada segmento deve
+    // receber, já que todos os segmentos devem ser da cor preta
     number === 8 ? "selected-segment" : isSelected
   );
 
@@ -56,6 +66,20 @@ const createLedSegment = (segment, number) => {
 };
 
 const ledScreenSegmentSwitcher = (ledSegment, number) => {
+  // Esta função é responsável por atribuir as classes para os segmentos que compõem um algarismo no display.
+  // Se a cor do segmento for preta, a classe escolhida será "selected-segment", caso contrário, e o segmento
+  // precisar ser da cor cinza claro, dando o aspecto de "apagado", a classe será "unselected-segment".
+  //
+  // A lógica da atribuição de classes para cada segmento se deu por um aninhamento de Switches, no qual primeiro
+  // é verificado qual número deverá ser formado, e depois qual o segmento está sendo tratado no momento, ex: "top-segment", "middle-segment"...
+  //
+  // Para cada algarismo, a atribuição de classes se deu da forma mais econômica possível.
+  // Para o número 0, por exemplo, é mais fácil apenas atribuir ao segmento "middle-segment" a classe "unselected-segment", e por padrão atribuir aos segmentos
+  // que não forem o "middle-segment" a classe "selected-segment" do que o contrário (atribuindo individualmente a classe "selected-segment" a todos os segmentos
+  // que não forem o "middle-segment", e atribuindo por padrão a classe "unselected-segment" aos segmentos que não forem especificados).
+  // Para o número 1, por exemplo, é mais fácil atribuir a classe "selected-segment" aos segmentos "top-right" e "bottom-right", e por padrão atribuir aos segmentos
+  // que não forem estes a classe "unselected-segment".
+
   switch (number) {
     case 0:
       switch (ledSegment) {
@@ -140,11 +164,16 @@ const ledScreenSegmentSwitcher = (ledSegment, number) => {
 };
 
 const setLedDisplay = (number) => {
+  // Criando o display de led.
   const ledInnerContainer = document.createElement("div");
   ledInnerContainer.className = "led-number-inner-container";
   const algorismContainer = document.createElement("div");
   algorismContainer.className = "algorism-container";
 
+  // As strings no array abaixo fazem referência aos segmentos que formam um algarismo no
+  // display, de acordo com o nome de cada SVG no diretório ./images.
+  //
+  // O nome de cada SVG faz alusão à posição de cada segmento que compõe um algarismo.
   const segmentsNamesArr = [
     "middle-segment",
     "top-left-segment",
@@ -155,6 +184,7 @@ const setLedDisplay = (number) => {
     "bottom-left-segment",
   ];
 
+  // Criando cada segmento de led que compõe um algarismo.
   for (segment in segmentsNamesArr) {
     algorismContainer.appendChild(
       createLedSegment(segmentsNamesArr[segment], number)
@@ -166,12 +196,13 @@ const setLedDisplay = (number) => {
 };
 
 const disableUserInput = () => {
+  // Desabilitando o input do usuário e o botão de enviar resposta.
   userInput.disabled = true;
   submitButton.disabled = true;
 };
 
 const newMatchHandler = () => {
-  // criando botão de "nova partida"
+  // Criando botão de "nova partida".
   const newMatchBtnContainer = document.querySelector(
     ".new-match-btn-container"
   );
@@ -183,35 +214,39 @@ const newMatchHandler = () => {
   newMatchBtn.className = "new-match-btn";
   newMatchBtn.innerText = "NOVA PARTIDA";
 
-  // implementando a funcionalidade de reiniciar o jogo
+  // Implementando a funcionalidade de reiniciar o jogo.
   newMatchBtn.addEventListener("click", () => document.location.reload());
 
   newMatchBtn.appendChild(refreshIcon);
   newMatchBtnContainer.appendChild(newMatchBtn);
 
-  // desabilitando os inputs
+  // Desabilitando os inputs.
   disableUserInput();
 };
 
 const handleVictory = (statusMessage) => {
   const selectedSegments = document.querySelectorAll(".selected-segment");
 
+  // Alterando a classe dos segmentos selecionados para selected-green-segment, trocando as cores do display para verde.
   for (segment of selectedSegments) {
     segment.classList.remove("selected-segment");
     segment.classList.add("selected-green-segment");
   }
 
+  // Exibindo a mensagem de vitória no display.
   statusMessage.innerHTML = "Você acertou!!!!";
   statusMessage.classList.add("victory-message");
 
-  // criando botao de jogar nova partida e implementando sua funcionalidade
+  // Criando botao de jogar nova partida e desabilitando os inputs.
   newMatchHandler();
 };
 
 const submittedNumberVerifier = (n) => {
+  // Resgatando o número sorteado via requisição.
   const sortedNum = Number(localStorage.getItem("sortedNumber"));
   const statusMessage = document.querySelector(".status-message");
 
+  // Alterando mensagem de status de acordo com o palpite do usuário enviado via input de texto.
   if (n > sortedNum) statusMessage.innerHTML = "É menor";
   if (n < sortedNum) statusMessage.innerHTML = "É maior";
   if (n === sortedNum) handleVictory(statusMessage);
@@ -221,6 +256,7 @@ const submitBtnHandler = () => {
   submitButton.addEventListener("click", () => {
     const { value } = userInput;
 
+    // Verificando se o input do usuário está da forma correta. Se não estiver, um alerta é exibido.
     if (
       isNaN(value) ||
       value.length == 0 ||
@@ -229,23 +265,24 @@ const submitBtnHandler = () => {
     )
       return alert("Insira um número não-negativo de 1 a 3 algarismos");
 
-    // limpando o display antes de exibir um novo valor
+    // Limpando o display antes de exibir um novo valor.
     while (ledContainer.firstChild) {
       ledContainer.removeChild(ledContainer.lastChild);
     }
 
-    // exibindo o novo valor no display
+    // Exibindo o novo valor no display.
     [...value].forEach((val) => setLedDisplay(Number(val)));
 
-    // checando se o usuario acertou o valor
+    // Checando se o usuario acertou o valor.
     submittedNumberVerifier(Number(value));
 
-    // limpando o input
+    // Limpando o input.
     userInput.value = "";
   });
 };
 
 window.onload = () => {
+  // Iniciando o display exibindo o número "0".
   setLedDisplay(0);
   submitBtnHandler();
   fetchNumber();
