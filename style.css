@@ -239,13 +239,12 @@ main {
 
   .title-bar-container {
     top: 100px;
-    width: fit-content;
+    width: fit-content
   }
 
   .title-bar {
     height: 1px;
-    transform: matrix(1, 0, 0, -1, 0, 0);
-    width: 255px;
+    transform: scale(1.26);
   }
 
   .status-container {

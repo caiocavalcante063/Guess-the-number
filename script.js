@@ -8,6 +8,7 @@ const fetchNumber = () => {
       // Se a requisição for bem sucedida, a função retorna o resultado convertido para Json,
       // do contrário, um erro é retornado.
       if (!response.ok) {
+        console.log(response);
         const res = await response.text();
         throw new Error(res);
       }
@@ -243,7 +244,13 @@ const submittedNumberVerifier = (n) => {
   // Alterando mensagem de status de acordo com o palpite do usuário enviado via input de texto.
   if (n > sortedNum) statusMessage.innerHTML = "É menor";
   if (n < sortedNum) statusMessage.innerHTML = "É maior";
-  if (n === sortedNum) handleVictory(statusMessage);
+  if (n === sortedNum) {
+    handleVictory(statusMessage);
+    statusMessage.classList.remove("wrong-answer");
+  }
+
+  (n > sortedNum || n < sortedNum) &&
+    statusMessage.classList.add("wrong-answer");
 };
 
 const submitBtnHandler = () => {
