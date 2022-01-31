@@ -2,7 +2,7 @@
 
 # Contexto
 
-Este projeto trata-se de uma aplicação em que a pessoa usuária deve adivinhar o número sorteado pela requisição feita ao endpoint utilizado.
+Este projeto trata-se de uma aplicação em que a pessoa usuária deve adivinhar o número sorteado pela requisição feita ao endpoint utilizado. O número digitado é exibido na tela através de um display em que cada segmento de um algarismo é controlado individualmente via JavaScript.
 
 ## Tecnologias utilizadas
 
